@@ -22,7 +22,6 @@ class ImageManager {
                 let image = self.decodeImage(image: UIImage(data: data as Data))
                 DispatchQueue.main.async {
                     imageView?.image = image
-                    print("cache")
                 }
             }
             return nil
