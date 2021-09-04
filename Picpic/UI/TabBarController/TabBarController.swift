@@ -64,8 +64,8 @@ class TabBarController: UITabBarController {
         let searchController = SearchController().embedInNav()
         searchController.tabBarItem = .init(
             title: "",
-            image: K.images.today,
-            selectedImage: K.images.today)
+            image: K.images.search,
+            selectedImage: K.images.search)
         
         viewControllers = [todayController, searchController]
         

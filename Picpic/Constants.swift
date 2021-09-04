@@ -12,4 +12,5 @@ struct K {
 }
 struct Images {
     let today = UIImage(named: "today")
+    let search = UIImage(named: "search-light")
 }

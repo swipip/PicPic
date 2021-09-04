@@ -35,4 +35,18 @@ extension UIView {
         childView.trailingAnchor.constraint(equalTo: mView.trailingAnchor,constant: constant).isActive = true
         
     }
+    func addSubview(pinToSafeAreaEdges constant: CGFloat, subView: UIView) {
+        
+        let childView: UIView = subView
+        let mView: UIView = self
+        
+        self.addSubview(childView)
+        childView.translatesAutoresizingMaskIntoConstraints = false
+        
+        childView.leadingAnchor.constraint(equalTo: mView.safeAreaLayoutGuide.leadingAnchor, constant: constant).isActive = true
+        childView.topAnchor.constraint(equalTo: mView.safeAreaLayoutGuide.topAnchor, constant: constant).isActive = true
+        childView.bottomAnchor.constraint(equalTo: mView.safeAreaLayoutGuide.bottomAnchor,constant: constant).isActive = true
+        childView.trailingAnchor.constraint(equalTo: mView.safeAreaLayoutGuide.trailingAnchor,constant: constant).isActive = true
+        
+    }
 }

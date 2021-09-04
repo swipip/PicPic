@@ -39,7 +39,7 @@ class TodayController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        view.addSubview(pinToEdges: 0, subView: collectionView)
+        view.addSubview(pinToSafeAreaEdges: 0, subView: collectionView)
         
         viewModel.delegate = self
         viewModel.loadPictures()
