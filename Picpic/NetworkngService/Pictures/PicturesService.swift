@@ -8,25 +8,25 @@
 import Foundation
 
 class PicturesService {
-    
+
     static let shared = PicturesService()
-    
+
     private var testMode = false
-    
+
     var cache = NSCache<NSString, NSData>()
-    
+
     private var debouncer: DispatchWorkItem?
-    
-    typealias PictureServiceBlock = (_ result: Result<[Photo],Error>)->()
+
+    typealias PictureServiceBlock = (_ result: Result<[Photo], Error>) -> Void
     func getListOfImages(_ completion: @escaping PictureServiceBlock) {
-        
+
         if testMode {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 completion(.success(self.getMock()))
             }
             return
         }
-        
+
         NetworkingService.shared.get(endPoint: .list) { result in
             switch result {
             case .success(let data):
@@ -44,11 +44,11 @@ class PicturesService {
                 completion(.failure(err))
             }
         }
-        
+
     }
-    
+
     func getUsersPictures(userName: String, _ completion: @escaping PictureServiceBlock) {
-        
+
         if testMode {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 completion(.success(self.getMock()))
@@ -76,13 +76,13 @@ class PicturesService {
             }
         }
     }
-    
-    func getStatistics(forPictureId id: String, _ completion: @escaping (_ stats: Stats) -> ()) {
-        
+
+    func getStatistics(forPictureId id: String, _ completion: @escaping (_ stats: Stats) -> Void) {
+
         guard !testMode else {
             return
         }
-        
+
         func decode(_ data: Data) -> Stats? {
             do {
                 let model = try JSONDecoder().decode(Stats.self, from: data)
@@ -92,13 +92,13 @@ class PicturesService {
                 return nil
             }
         }
-        
+
         if let data = cache.object(forKey: NSString(string: id)) as Data? {
             guard let model = decode(data) else {return}
             completion(model)
             return
         }
-        
+
         debouncer?.cancel()
         debouncer = .init(block: {
             NetworkingService.shared.get(endPoint: .stats(pictureId: id)) { result in
@@ -108,16 +108,15 @@ class PicturesService {
                         guard let model = decode(data) else {return}
                         completion(model)
                     }
-                break
                 case .failure(_):
                     break
                 }
             }
         })
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: debouncer!)
     }
-    
+
     private func getMock() -> [Photo] {
         guard let url = Bundle.main.url(forResource: "SamplePhotos", withExtension: "json") else {return []}
         do {
@@ -128,5 +127,5 @@ class PicturesService {
             return []
         }
     }
-    
+
 }

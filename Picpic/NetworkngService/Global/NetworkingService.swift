@@ -8,14 +8,14 @@
 import Foundation
 
 class NetworkingService {
-        
+
     static let shared = NetworkingService()
-    
+
     enum EndPoint {
         case list
         case user(userName: String)
         case stats(pictureId: String)
-        
+
         var entry: WebServiceEntry {
             switch self {
             case .list:
@@ -27,12 +27,12 @@ class NetworkingService {
             }
         }
     }
-    typealias NetworkingCompletionBlock = ((_ result: Result<Data,Error>)->())
+    typealias NetworkingCompletionBlock = ((_ result: Result<Data, Error>) -> Void)
     func get(endPoint: EndPoint, _ completion: @escaping NetworkingCompletionBlock) {
-        
+
         let session = URLSession.shared
         let request = URLRequest(url: endPoint.entry.url)
-        let task = session.dataTask(with: request) { data, response, error in
+        let task = session.dataTask(with: request) { data, _, error in
             print("call: \(request.url?.absoluteString ?? "")")
             if let err = error {
                 completion(.failure(err))
@@ -41,11 +41,7 @@ class NetworkingService {
             }
         }
         task.resume()
-        
-    }
-    
-}
 
-class ApiResponseHandler {
-    
+    }
+
 }

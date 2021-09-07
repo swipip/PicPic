@@ -1,0 +1,10 @@
+disabled_rules: # rule identifiers turned on by default to exclude from running
+  - trailing_whitespace
+
+force_cast: 
+  severity: warning # implicitly
+
+line_length: 120
+
+identifier_name:
+  min_length: 2

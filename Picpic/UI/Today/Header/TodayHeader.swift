@@ -9,7 +9,7 @@ import UIKit
 
 class TodayHeader: UICollectionReusableView, Reusable {
     static var reuseId = "TodayHeader"
-    
+
     @IBOutlet weak var dateLabel: UILabel! {
         didSet {
             let date = Date()
@@ -18,5 +18,5 @@ class TodayHeader: UICollectionReusableView, Reusable {
             dateLabel.text = formater.string(from: date)
         }
     }
-    
+
 }

@@ -12,7 +12,7 @@ protocol Reusable {
 }
 
 extension UICollectionView {
-    func dqReusableCell<T: Reusable & UICollectionViewCell>(ofType type: T.Type,for indexPath: IndexPath) -> T {
+    func dqReusableCell<T: Reusable & UICollectionViewCell>(ofType type: T.Type, for indexPath: IndexPath) -> T {
         let cell = self.dequeueReusableCell(withReuseIdentifier: T.reuseId, for: indexPath) as! T
         cell.sendSubviewToBack(cell.contentView)
         return cell

@@ -12,26 +12,28 @@ class ImageManager {
     static let shared = ImageManager()
     
     var cache = NSCache<NSString, NSData>()
-    
+
     @discardableResult
-    func loadImage(withUrlString urlString: String, for imageView: UIImageView) -> URLSessionDataTask? {
+    func loadImage(withUrlString urlString: String, for imageView: UIImageView) -> (() -> Void)? {
         
-        if let data = cache.object(forKey: .init(string: urlString)){
+        var workItem: DispatchWorkItem?
+        
+        if let data = cache.object(forKey: .init(string: urlString)) {
             let queue = DispatchQueue(label: "decode image", qos: .userInitiated, attributes: .concurrent)
-            queue.async { [weak imageView] in
+            workItem = DispatchWorkItem { [weak imageView] in
                 let image = self.decodeImage(image: UIImage(data: data as Data))
                 DispatchQueue.main.async {
                     imageView?.image = image
                 }
             }
-            return nil
+            queue.asyncAfter(deadline: .now() + 0.05, execute: workItem!)
+            
         }
         let task = urlSession(urlString: urlString) { [weak imageView] result in
             switch result {
             case .success(let data):
                 let encodedImage = UIImage(data: data)
                 let image = self.decodeImage(image: encodedImage)
-                
                 DispatchQueue.main.async {
                     imageView?.image = image
                 }
@@ -40,19 +42,28 @@ class ImageManager {
                 break
             }
         }
-        return task
+        
+        let cancelTask: (() -> Void)?
+        cancelTask = {
+            workItem?.cancel()
+            task?.cancel()
+        }
+        return cancelTask
     }
     
     @discardableResult
-    private func urlSession(urlString: String, _ comletion: @escaping (_ result: Result<Data, Error>) -> ()) -> URLSessionDataTask? {
+    private func urlSession(
+        urlString: String,
+        _ comletion: @escaping(_ result: Result<Data, Error>) -> Void) -> URLSessionDataTask? {
+        
         if let url = URL(string: urlString) {
             let request = URLRequest(url: url)
             let session = URLSession.shared
             let task = session.dataTask(with: request) { data, response, error in
-            
+                
                 if let err = error as NSError? {
                     if err.code == -999 {
-                        // task Canceled
+                        print("task canceled")
                     }
                     comletion(.failure(err))
                 } else if let data = data {

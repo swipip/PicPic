@@ -8,7 +8,7 @@
 import UIKit
 
 class TabBarController: UITabBarController {
-    
+
     // MARK: UI elements 􀯱
     private lazy var tabBarBorder: UIView = {
         let view = UIView()
@@ -21,7 +21,7 @@ class TabBarController: UITabBarController {
         view.layer.cornerRadius = 3 / 2
         return view
     }()
-    
+
     private var dotCenterXPosition: CGFloat {
         let nbControllers = CGFloat(viewControllers?.count ?? 1)
         let width = view.frame.width
@@ -29,76 +29,90 @@ class TabBarController: UITabBarController {
         let interval = width / (nbControllers)
         return interval * selectedCtrl - interval/2
     }
-    
+
     private var selectionDotCenterXConstraint: NSLayoutConstraint?
+
+    enum Constants {
+        static let animationDuration: TimeInterval = 0.2
+        static let tabBarOffSet: CGFloat = 100
+    }
     
     // MARK: View life cycle 􀐰
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         delegate = self
-        
+
         setUp()
     }
 
     // MARK: UI construction 􀤋
-    
+
     func animateTabBar(on: Bool) {
+
+        let tabBarElements: [UIView] = [tabBar, tabBarBorder, selectionDot]
         
-        UIView.animate(withDuration: 0.2) {
-            self.tabBar.frame.origin.y += (on ? -100 : 100)
-            self.tabBarBorder.frame.origin.y += (on ? -100 : 100)
-            self.selectionDot.frame.origin.y += (on ? -100 : 100)
+        UIView.animate(withDuration: Constants.animationDuration) {
+            tabBarElements.forEach { view in
+                view.frame.origin.y += (on ? -Constants.tabBarOffSet : Constants.tabBarOffSet)
+            }
         }
-        
+
     }
-    
+
     func setUp() {
-        
+
         let todayController = TodayController()
         todayController.tabBarItem = .init(
             title: "",
             image: K.images.today,
             selectedImage: K.images.today)
-        
+
         let searchController = SearchController().embedInNav()
         searchController.tabBarItem = .init(
             title: "",
             image: K.images.search,
             selectedImage: K.images.search)
-        
+
         viewControllers = [todayController, searchController]
-        
+
         styleTabBar()
         addBottomBorder()
         addSelectionDot()
-        
+
     }
     private func styleTabBar() {
-        
+
         tabBar.tintColor = .systemTeal
         tabBar.backgroundImage = UIImage()
         tabBar.shadowImage = UIImage()
         tabBar.backgroundColor = .systemBackground
-        
-        viewControllers?.map({$0.tabBarItem}).forEach(
-            {$0?.imageInsets = UIEdgeInsets(top: 5, left: 0, bottom: -10, right: 0)})
+
+        viewControllers?
+            .map {$0.tabBarItem}
+            .forEach {$0?.imageInsets = UIEdgeInsets(top: 5, left: 0, bottom: -10, right: 0)}
     }
-    
+
     private func addBottomBorder() {
         let childView: UIView = tabBarBorder
         let mView: UIView = view
-        
+
         view.addSubview(childView)
         childView.translatesAutoresizingMaskIntoConstraints = false
+
+        childView.leadingAnchor.constraint(
+            equalTo: mView.leadingAnchor, constant: 0).isActive = true
         
-        childView.leadingAnchor.constraint(equalTo: mView.leadingAnchor, constant: 0).isActive = true
-        childView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        childView.heightAnchor.constraint(
+            equalToConstant: 1).isActive = true
+        
         childView.bottomAnchor.constraint(
-            equalTo: mView.safeAreaLayoutGuide.bottomAnchor,constant: -tabBar.frame.height).isActive = true
-        childView.trailingAnchor.constraint(equalTo: mView.trailingAnchor,constant: 0).isActive = true
+            equalTo: mView.safeAreaLayoutGuide.bottomAnchor, constant: -tabBar.frame.height).isActive = true
+        
+        childView.trailingAnchor.constraint(
+            equalTo: mView.trailingAnchor, constant: 0).isActive = true
     }
-    
+
     private func addSelectionDot() {
         let childView: UIView = selectionDot
         let mView: UIView = view
@@ -109,10 +123,16 @@ class TabBarController: UITabBarController {
         selectionDotCenterXConstraint = childView.centerXAnchor.constraint(
             equalTo: mView.leadingAnchor, constant: dotCenterXPosition)
         selectionDotCenterXConstraint?.isActive = true
+        
         childView.centerYAnchor.constraint(
-            equalTo: mView.safeAreaLayoutGuide.bottomAnchor, constant: -tabBar.frame.height).isActive = true
-        childView.heightAnchor.constraint(equalToConstant: 3).isActive = true
-        childView.widthAnchor.constraint(equalToConstant: 20).isActive = true
+            equalTo: mView.safeAreaLayoutGuide.bottomAnchor,
+            constant: -tabBar.frame.height).isActive = true
+        
+        childView.heightAnchor.constraint(
+            equalToConstant: 3).isActive = true
+        
+        childView.widthAnchor.constraint(
+            equalToConstant: 20).isActive = true
     }
     
 }
@@ -123,12 +143,15 @@ extension TabBarController: UITabBarControllerDelegate {
             self.view.layoutIfNeeded()
         }
     }
-    func tabBarController(_ tabBarController: UITabBarController, animationControllerForTransitionFrom fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        animationControllerForTransitionFrom fromVC: UIViewController,
+        to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
         let animator = TabBarControllerAnimator()
         let controller = (toVC as? UINavigationController)?.viewControllers.first
-        
-        if let _  = controller as? SearchController {
+
+        if controller is SearchController {
             animator.direction = .fromRight
             return animator
         } else {

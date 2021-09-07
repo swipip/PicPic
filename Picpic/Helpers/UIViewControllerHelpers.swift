@@ -11,7 +11,7 @@ extension UIViewController {
     func embedInNav() -> UINavigationController {
         return UINavigationController(rootViewController: self)
     }
-    
+
     var safeAreaInsetsWithNavBar: UIEdgeInsets {
         let safeArea = UIApplication.shared.windows.first?.safeAreaInsets ?? .zero
         let topSafe = (safeArea.top) + UINavigationController().navigationBar.frame.height

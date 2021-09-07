@@ -12,7 +12,7 @@ struct Photo: Decodable, Hashable, Picturable {
     var urls: URLS
     var user: User
     var likes: Int
-    
+
     var likesString: String {
         return "\(likes) like" + "\(likes > 1 ? "s" : "")"
     }
@@ -30,7 +30,14 @@ struct User: Decodable, Hashable {
     var id: String
     var username: String
     var name: String
-    var profile_image: URLS
+    var profileImage: URLS
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case username
+        case name
+        case profileImage = "profile_image"
+    }
 }
 
 protocol Picturable {

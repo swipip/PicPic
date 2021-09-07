@@ -12,11 +12,11 @@ protocol TodayControllerViewModelDelegate: AnyObject {
     func todayControllerViewModel(didReceiveError error: Error)
 }
 class TodayControllerViewModel {
-    
+
     weak var delegate: TodayControllerViewModelDelegate?
-    
+
     var pictures: [Photo] = []
-    
+
     func loadPictures() {
         PicturesService.shared.getListOfImages { [weak self] pictures in
             switch pictures {
@@ -28,11 +28,11 @@ class TodayControllerViewModel {
             }
         }
     }
-    
+
     func prefetchPicture(at index: Int) {
         if let url = pictures[index].urls.regular {
             ImageManager.shared.precacheImage(urlString: url)
         }
     }
-    
+
 }
